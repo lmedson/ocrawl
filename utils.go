@@ -42,6 +42,7 @@ func ResolveUrls(link string, baseURL string) string {
 func Plot(res CrawlerResult, fileName string) {
 	var urlKeys []charts.GraphNode
 
+	// here we separate all the urls crawled, how a node
 	for i := range res.Crawled {
 		urlKeys = append(urlKeys, charts.GraphNode{Name: res.Crawled[i]})
 	}
@@ -51,10 +52,9 @@ func Plot(res CrawlerResult, fileName string) {
 
 	graph.Add("Url Relations Map", urlKeys, func() []charts.GraphLink {
 		links := make([]charts.GraphLink, 0)
-
+		// set the relations in map
 		for i := 0; i < len(urlKeys); i++ {
 			for j := 0; j < len(res.RelationLinks[i].RelatedLinks); j++ {
-
 				links = append(links,
 					charts.GraphLink{Source: urlKeys[i].Name, Target: res.RelationLinks[i].RelatedLinks[j]})
 			}
@@ -64,11 +64,13 @@ func Plot(res CrawlerResult, fileName string) {
 		charts.GraphOpts{Force: charts.GraphForce{Repulsion: 5000}},
 	)
 
+	// Create the file owner of graph
 	plottedGraph, err := os.Create(fileName + ".html")
 
 	if err != nil {
 		log.Println(err)
 	}
 
+	// render the graph
 	graph.Render(plottedGraph)
 }

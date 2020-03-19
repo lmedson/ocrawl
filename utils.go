@@ -1,6 +1,8 @@
 package crawler
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -73,4 +75,14 @@ func Plot(res CrawlerResult, fileName string) {
 
 	// render the graph
 	graph.Render(plottedGraph)
+}
+
+func JsonParse(crawledData CrawlerResult, fileName string) {
+	parsedData, _ := json.Marshal(crawledData)
+
+	f, _ := os.Create(fileName + ".json")
+	f.WriteString(string(parsedData))
+	f.Close()
+
+	fmt.Printf("Your json file with crawled data was created how %s.json", fileName)
 }

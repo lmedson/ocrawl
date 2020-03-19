@@ -16,11 +16,27 @@ First, you need to create a go file and set a url to be crawled. To visualize th
 
 ```go
     func main(){
-        crawlerResult := crawler.Crawl("https://clojure.org/")
-        crawler.Plot(crawlerResult, "index") // to plot a index.html file with the graph
+        crawledData := crawler.Crawl("https://clojure.org/")
+        crawler.Plot(crawledData, "index") // to plot a index.html file with the graph
     }
 ```
 
+## Crawling assets example:
+
+```go
+    func main(){
+        crawler.CrawlAssets("https://clojure.org/") // you can to plot or parse to json the outputed data
+    }
+```
+
+## Formating output data example:
+
+```go
+    func main(){
+        crawledData := crawler.Crawl("https://clojure.org/")
+        crawler.JsonParse(crawledData, "data")
+    }
+```
 ## Runinng
 
 Make sure you have installed all the dependencies. Run your created file, with above code:
@@ -43,5 +59,6 @@ The package structure folder
 ├── Gopkg.lock                  # It locks the version of packages
 ├── Gopkg.toml                  # Controls the import instructions, used by the lock file
 ├── <filename>.html             # After graph plot, you will have this output file
+├── <filename>.json             # After json parse crawled data, you will have this output file
 └── utils.py                    # File with some helpers
 ```

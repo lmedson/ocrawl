@@ -3,6 +3,7 @@ package crawler
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -62,4 +63,58 @@ func Crawl(url string) CrawlerResult {
 	fmt.Printf("Crawling completed with %d urls mapped ", len(crawler.Crawled))
 
 	return crawler
+}
+
+func CrawlAssets(url string) CrawlerResult {
+	result := Crawl(url)
+	for key := range result.RelationLinks {
+		result.AssetsMapList = append(result.AssetsMapList, AssetsMap{
+			Page:   result.RelationLinks[key].Page,
+			Images: []Img{},
+			Css:    []string{},
+			Js:     []string{},
+		})
+
+		res, _ := http.Get(result.RelationLinks[key].Page)
+		page, _ := goquery.NewDocumentFromResponse(res)
+
+		page.Find("img").Each(func(i int, s *goquery.Selection) {
+			alt, _ := s.Attr("alt")
+			src, _ := s.Attr("src")
+
+			resolvedURL := ResolveUrls(src, url)
+
+			if (len(resolvedURL) > 0) && (len(alt) > 0) {
+				result.AssetsMapList[key].Images = append(result.AssetsMapList[key].Images, Img{
+					ImageLink: resolvedURL,
+					ImageName: alt,
+				})
+			}
+		})
+
+		page.Find("link").Each(func(i int, s *goquery.Selection) {
+			link, _ := s.Attr("href")
+
+			if strings.HasSuffix(link, ".css") {
+				if strings.HasPrefix(link, "/") {
+					result.AssetsMapList[key].Css = append(result.AssetsMapList[key].Css, url+link)
+				} else {
+					result.AssetsMapList[key].Css = append(result.AssetsMapList[key].Css, link)
+				}
+			}
+		})
+
+		page.Find("script").Each(func(i int, s *goquery.Selection) {
+			link, _ := s.Attr("src")
+
+			if len(link) > 0 {
+				if strings.HasPrefix(link, "/") {
+					result.AssetsMapList[key].Js = append(result.AssetsMapList[key].Js, url+link)
+				} else {
+					result.AssetsMapList[key].Js = append(result.AssetsMapList[key].Js, link)
+				}
+			}
+		})
+	}
+	return result
 }

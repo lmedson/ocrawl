@@ -1,7 +1,4 @@
 # OCrawl - A simple crawler to map sites relations 
-
-Structure for app :open_file_folder: :octocat:
-
 ![GO](https://img.shields.io/badge/go-1.13.6-blue.svg)
 ## Installation
 
